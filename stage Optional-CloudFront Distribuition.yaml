@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creazione distribuzione Cloudfront"
+
+Parameters:
+  TargetOriginId:
+    Type: String
+    Default: "alb-haystest-08081969-1597845484.eu-central-1.elb.amazonaws.com"
+  DomainName:
+    Type: String
+    Default: "alb-haystest-08081969-1597845484.eu-central-1.elb.amazonaws.com"
+  OriginId:
+    Type: String
+    Default: "alb-haystest-08081969-1597845484.eu-central-1.elb.amazonaws.com"
+
+Resources:
+  CloudFrontDistribution00E1431OJEA2542Q002XDU2:
+    UpdateReplacePolicy: "Delete"
+    Type: "AWS::CloudFront::Distribution"
+    DeletionPolicy: "Delete"
+    Properties:
+      DistributionConfig:
+        Logging:
+          IncludeCookies: false
+          Bucket: ""
+          Prefix: ""
+        Comment: ""
+        DefaultRootObject: ""
+        Origins:
+          - ConnectionTimeout: 10
+            OriginAccessControlId: ""
+            ConnectionAttempts: 3
+            OriginCustomHeaders: []
+            DomainName: !Ref DomainName
+            OriginShield:
+              Enabled: false
+            OriginPath: ""
+            Id: !Ref OriginId
+            CustomOriginConfig:
+              OriginKeepaliveTimeout: 5
+              OriginReadTimeout: 30
+              OriginSSLProtocols:
+                - "TLSv1.2"
+              HTTPSPort: 443
+              HTTPPort: 80
+              OriginProtocolPolicy: "https-only"
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        PriceClass: "PriceClass_All"
+        DefaultCacheBehavior:
+          Compress: true
+          FunctionAssociations: []
+          LambdaFunctionAssociations: []
+          TargetOriginId: !Ref TargetOriginId
+          ViewerProtocolPolicy: "allow-all"
+          TrustedSigners: []
+          DefaultTTL: 86400
+          FieldLevelEncryptionId: ""
+          TrustedKeyGroups: []
+          AllowedMethods:
+            - "HEAD"
+            - "GET"
+          CachedMethods:
+            - "HEAD"
+            - "GET"
+          SmoothStreaming: false
+          ForwardedValues:
+            QueryStringCacheKeys: []
+            Cookies:
+              Forward: "none"
+            Headers: []
+            QueryString: false
+        Staging: false
+        CustomErrorResponses: []
+        ContinuousDeploymentPolicyId: ""
+        OriginGroups:
+          Quantity: 0
+          Items: []
+        Enabled: true
+        Aliases: []
+        IPV6Enabled: true
+        HttpVersion: "http2and3"
+        Restrictions:
+          GeoRestriction:
+            Locations: []
+            RestrictionType: "none"
+        CacheBehaviors: []

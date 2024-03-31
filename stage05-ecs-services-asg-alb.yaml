@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  LoadBalancerArn:
+    Type: String
+    Description: ARN del Load Balancer associato a CloudFront
+
+Resources:
+  WAFWebACL:
+    Type: 'AWS::WAFv2::WebACL'
+    Properties:
+      DefaultAction:
+        Allow: {}
+      Scope: REGIONAL
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: WebACL
+      Description: Web ACL per proteggere la distribuzione CloudFront
+      Name: MyWebACL
+
+  WAFWebACLAssociation:
+    Type: 'AWS::WAFv2::WebACLAssociation'
+    Properties:
+      ResourceArn: !Ref LoadBalancerArn
+      WebACLArn: !GetAtt WAFWebACL.Arn
+

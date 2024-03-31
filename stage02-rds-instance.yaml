@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deployment of an RDS instance
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: ID della VPC in cui creare l'istanza RDS
+  SubnetIds:
+    Type: List<String>
+    Description: Lista delle subnet in cui posizionare l'istanza RDS (almeno 4 valori)
+  FrontendSecurityGroup:
+    Type: String
+    Description: ID del security group frontend al quale collegarsi per l'istanza RDS
+  MasterUsername:
+    Type: String
+    Description: Username del master per l'istanza RDS
+  MasterUserPassword:
+    Type: String
+    Description: >
+      Password del master per l'istanza RDS. Deve essere lunga almeno 8 caratteri.
+  DBName:
+    Type: String
+    Description: Nome del database da creare sull'istanza RDS
+
+Resources:
+  MyDBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: 'Subnet group for RDS instance'
+      SubnetIds: !Ref SubnetIds
+
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security group for RDS instance'
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref FrontendSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          DestinationSecurityGroupId: !Ref FrontendSecurityGroup
+
+  MyDBInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceIdentifier: 'RDS-myql'
+      Engine: 'mysql'
+      EngineVersion: '8.0.35'
+      DBInstanceClass: 'db.t3.micro'
+      AllocatedStorage: 20
+      DBSubnetGroupName: !Ref MyDBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref MySecurityGroup
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterUserPassword
+      DBName: !Ref DBName
+      MultiAZ: false
+      StorageType: 'gp2'
